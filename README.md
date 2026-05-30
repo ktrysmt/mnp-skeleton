@@ -1,72 +1,75 @@
 # MNP skeleton
 
-中間記法パターン(MNP)の使い回せるスケルトン。図の状態を外部のテキストファイル(`data/diagram.mnp`)として持ち、それを Claude Code が直接編集することで、APIキーなしに「AIと会話しながら図を編集する」体験を実現する。ランタイム依存ゼロ(Nodeの標準モジュールのみ)。
+English | [日本語](./README-ja.md)
+
+A reusable skeleton for the **Mid Notation Pattern (MNP)**. The diagram state lives in an external text file (`data/diagram.mnp`). Claude Code edits that file directly, giving you an "edit a diagram by talking to an AI" experience with no API key. Zero runtime dependencies (Node built-ins only).
 
 ## UX
 
 ```
 git clone <repo>
 cd mnp-skeleton
-npm start            # = node server.js（npm install 不要）
-# → http://127.0.0.1:8777/ をブラウザで開く
+npm start            # = node server.js (no npm install)
+# → open http://127.0.0.1:8777/ in a browser
 ```
 
-- ブラウザでノードをドラッグ・追加・接続 → `/save` 経由で `data/diagram.mnp` に自動保存
-- Claude Code に「`data/diagram.mnp` に配達員を追加して客と配送でつないで」と頼む → ファイルが書き換わり、ページが ~1.5秒で自動反映
-- 右ペインの記法テキストを直接編集しても図に反映(双方向)
+- Drag / add / connect nodes in the browser → auto-saved to `data/diagram.mnp` via `/save`.
+- Ask Claude Code, e.g. "add a courier to `data/diagram.mnp` and connect it to the customer with a delivery edge" → the file changes and the page reflects it within ~1.5s.
+- Editing the notation text in the right pane also updates the figure (two-way).
 
-APIキーは不要。AIエンジンの役割は Claude Code が `data/diagram.mnp` を編集することで担う(同梱の `CLAUDE.md` がそのルールを定義)。
+No API key needed. Claude Code plays the role of the AI engine by editing `data/diagram.mnp` (the bundled `CLAUDE.md` defines the rules it follows).
 
-## データを外から差し込む
+## Injecting your own data / domain
 
-このスケルトンは「グラフ(ノード＋矢印)」の表現に特化している。以下の3つを書き換えるだけで、別ドメインに転用できる(JavaScriptの編集は不要)。
+This skeleton specializes in node-and-edge **graph** rendering. To repurpose it for another domain, edit just these three files — no JavaScript changes required:
 
-| ファイル | 役割 |
+| File | Role |
 |---|---|
-| `data/diagram.mnp` | データ実体。初期状態をここに書く |
-| `domain/schema.js` | ノードの色・アイコン・属性、矢印の種類、タイトル、データファイルのパス |
-| `domain/NOTATION.md` | 記法仕様と設計規約(=Claude Codeが従うルール) |
+| `data/diagram.mnp` | The data itself. Put your initial state here. |
+| `domain/schema.js` | Node colors / icons / attributes, edge tokens, title, and the data file path. |
+| `domain/NOTATION.md` | Notation spec and design rules (the rules Claude Code follows). |
 
-グラフで表せない題材(カンバン・フォーム等)は `engine.js` の `render`/`parse`/`serialize` を差し替える必要がある。
+For non-graph subjects (kanban, forms, etc.) you also need to replace `render` / `parse` / `serialize` in `engine.js`.
 
-## 構成
+## Layout
 
 ```
 mnp-skeleton/
-  README.md
-  CLAUDE.md          Claude Code への編集ルール
-  package.json       start: node server.js（依存ゼロ）
-  server.js          静的配信 ＋ POST /save（ドラッグ結果をファイルへ書き戻す）
-  index.html         画面
-  engine.js          ドメイン非依存エンジン（parse/serialize/render/drag/sync/poll/save）
+  README.md          English (default)
+  README-ja.md       Japanese
+  CLAUDE.md          Editing rules for Claude Code
+  package.json       start: node server.js (zero deps)
+  server.js          Static serving + POST /save (persists drags back to the file)
+  index.html         The UI
+  engine.js          Domain-agnostic engine (parse/serialize/render/drag/sync/poll/save)
   domain/
-    schema.js        ← ドメイン設定（編集する）
-    NOTATION.md      ← 記法仕様・規約（編集する）
+    schema.js        ← domain config (edit this)
+    NOTATION.md      ← notation spec & rules (edit this)
   data/
-    diagram.mnp      ← データ（編集する / Claudeが編集する）
+    diagram.mnp      ← data (you / Claude Code edit this)
 ```
 
-## 仕組み(MNPの同期ループ)
+## How it works (the MNP sync loop)
 
 ```
 data/diagram.mnp ──poll(1.5s)──▶ parse ──▶ render(SVG)
        ▲                                        │
-       └────── POST /save ◀── serialize ◀── ドラッグ/記法編集
+       └────── POST /save ◀── serialize ◀── drag / notation edit
        ▲
-       └────── Claude Code がファイルを編集
+       └────── Claude Code edits the file
 ```
 
-AIが扱うのは軽量なテキスト記法のみで、描画はローカル(ブラウザのJS)が担う。これによりAI出力が小さく保たれる(MNPの速度・コスト優位の根拠)。
+The AI only ever handles the lightweight text notation; rendering happens locally (browser JS). This keeps the AI's output small — the source of MNP's speed and cost advantage.
 
-## 設定
+## Configuration
 
-- ポート: `PORT=9000 npm start`(既定 8777)
-- バインド先: `HOST=0.0.0.0 npm start`(既定 127.0.0.1)
+- Port: `PORT=9000 npm start` (default 8777)
+- Bind address: `HOST=0.0.0.0 npm start` (default 127.0.0.1)
 
-## クレジット
+## Credit
 
-「中間記法パターン(MNP / Mid Notation Pattern)」は、アプリの状態をAIが読み書きしやすいテキスト記法(DSL)で持ち双方向に同期させる、という設計パターンの名称。このリポジトリはその考え方の実装スケルトンである。
+The **Mid Notation Pattern (MNP)** is the name of a design pattern: hold an application's state in a text notation (a DSL) that an AI can read and write, and keep it in two-way sync with the app. This repository is an implementation skeleton of that idea.
 
-## ライセンス
+## License
 
 MIT License. See [LICENSE](./LICENSE).
