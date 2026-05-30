@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MNP skeleton</title>
+<style>
+  :root { --bg:#11151c; --panel:#1a2029; --line:#2a323d; --fg:#e6edf3; --mut:#8b97a6; --accent:#5cc8c8; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+    font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif; }
+  #app { display:grid; grid-template-columns:1fr 400px; grid-template-rows:auto 1fr; height:100vh; }
+  header { grid-column:1/3; display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    padding:8px 12px; border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { font-size:14px; margin:0 12px 0 0; font-weight:700; }
+  button { background:#222b36; color:var(--fg); border:1px solid var(--line); border-radius:6px;
+    padding:5px 10px; font-size:12px; cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.on { background:var(--accent); color:#06222a; border-color:var(--accent); font-weight:700; }
+  #canvas-wrap { position:relative; overflow:hidden; }
+  svg { width:100%; height:100%; display:block; cursor:grab; background:
+    radial-gradient(circle at 1px 1px, #1d2530 1px, transparent 0) 0 0/24px 24px; }
+  .side { border-left:1px solid var(--line); background:var(--panel); display:flex; flex-direction:column; min-height:0; }
+  .side h2 { font-size:11px; color:var(--mut); margin:0; padding:8px 12px 4px; letter-spacing:.05em; text-transform:uppercase; }
+  textarea { width:100%; border:0; background:#0d1117; color:#cfe; font-family:"JetBrains Mono",ui-monospace,monospace;
+    font-size:12px; line-height:1.5; padding:10px 12px; resize:none; }
+  #notation { flex:1 1 auto; min-height:0; }
+  .cc { border-top:1px solid var(--line); padding:10px 12px; display:flex; flex-direction:column; gap:8px; }
+  .row { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .pill { font-size:11px; padding:2px 8px; border-radius:99px; border:1px solid var(--line); color:var(--mut); }
+  .pill.live { color:#06222a; background:var(--accent); border-color:var(--accent); font-weight:700; }
+  #log { font-size:11px; color:var(--mut); max-height:120px; overflow:auto; padding:6px 12px;
+    border-top:1px solid var(--line); white-space:pre-wrap; }
+  .node-label { font-size:13px; font-weight:700; fill:#06222a; pointer-events:none; }
+  .node-sub { font-size:10px; fill:#06343f; pointer-events:none; }
+  .edge-label { font-size:11px; fill:#aeb9c6; pointer-events:none; }
+  .hint { font-size:11px; color:var(--mut); padding:0 12px 8px; line-height:1.5; }
+  .badge { font-size:10px; color:var(--mut); }
+  code { background:#0d1117; padding:1px 5px; border-radius:4px; font-size:11px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 id="title">MNP skeleton</h1>
+    <button id="addBtn">＋ノード</button>
+    <button id="linkBtn">→ 接続</button>
+    <button id="delBtn">🗑 削除</button>
+    <button id="fitBtn">⊡ 全体</button>
+    <span class="badge" id="stat" style="margin-left:auto"></span>
+  </header>
+
+  <div id="canvas-wrap"><svg id="svg" viewBox="0 0 1200 800"></svg></div>
+
+  <div class="side">
+    <h2>中間記法（data/diagram.mnp と同期）</h2>
+    <div class="hint">この記法を Claude Code が直接編集します。ファイルが変わるとポーリングが検知して図を自動更新。図をドラッグすると <code>/save</code> 経由でファイルへ書き戻します（双方向）。</div>
+    <textarea id="notation" spellcheck="false"></textarea>
+    <div class="cc">
+      <div class="row">
+        <span id="livePill" class="pill">● ファイル監視: 停止</span>
+        <button id="watchBtn" class="on">監視 ON/OFF</button>
+        <button id="reloadBtn">↻ 今すぐ読込</button>
+        <button id="copyBtn">📋 記法コピー</button>
+      </div>
+      <div class="hint" style="padding:0">
+        Claude Code に「<code>data/diagram.mnp に〇〇を追加して</code>」と頼む → ~1.5秒で自動反映。
+      </div>
+    </div>
+    <div id="log"></div>
+  </div>
+</div>
+
+<script src="domain/schema.js"></script>
+<script src="engine.js"></script>
+</body>
+</html>

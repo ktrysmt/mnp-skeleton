@@ -1,0 +1,26 @@
+# service ecosystem — this file is the data. Edit it (by hand or via Claude Code).
+
+actor O "ネコカフェ運営" teal store
+  role: 運営・猫のケア
+
+actor C "客" pink person
+  role: 来店客
+
+actor S1 "仕入先" amber company
+  role: フード・備品供給
+
+actor D "配達員" sky person
+  role: デリバリー配送
+
+O -> C "癒し空間 / ドリンク・軽食"
+C --> O "料金 / リピート"
+S1 -> O "フード・備品"
+O --> S1 "発注 / 支払い"
+O -> D "配送委託 / 報酬"
+D -> C "商品の配送"
+
+layout
+O 500 400
+C 850 300
+S1 250 550
+D 850 560

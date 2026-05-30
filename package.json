@@ -1,0 +1,35 @@
+{
+  "name": "mnp-skeleton",
+  "version": "0.1.0",
+  "description": "A reusable skeleton for the Mid Notation Pattern (MNP): a config-driven graph editor whose data is an external notation file, editable live by Claude Code. Zero runtime dependencies.",
+  "type": "commonjs",
+  "author": "ktrysmt",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ktrysmt/mnp-skeleton.git"
+  },
+  "homepage": "https://github.com/ktrysmt/mnp-skeleton#readme",
+  "bugs": {
+    "url": "https://github.com/ktrysmt/mnp-skeleton/issues"
+  },
+  "keywords": [
+    "mnp",
+    "mid-notation-pattern",
+    "dsl",
+    "diagram",
+    "editor",
+    "claude-code",
+    "ai",
+    "graph"
+  ],
+  "bin": {
+    "mnp-skeleton": "server.js"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
